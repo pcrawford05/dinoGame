@@ -15,6 +15,7 @@ volatile bool selectPressed = 0;
 volatile bool upPressed = 0;
 volatile bool downPressed = 0;
 
+// Helper functions
 void debounce(uint8_t);
 void shiftString(char*, char);
 char generateObstacle(uint8_t);
@@ -70,7 +71,7 @@ int main(void){
     }
 
     for(int i = 0; i < 3; i++){
-        highNameNum[i] = eeprom_read_byte((void *) (10+ i));
+        highNameNum[i] = eeprom_read_byte((void *) (10 + i));
     }
 
     // See if we got good data from EEPROM
@@ -163,12 +164,33 @@ int main(void){
                 lcd_moveto(1,5 + cursorIdx);
                 debounce(DOWN);
             } else if(selectPressed){
-                if(cursorIdx != 3){
+                debounce(SELECT);
+                // Special way to reset the high score as needed (but only if there is one)
+                if(highNameStr[0] != ' ' && ((PINC & (1 << UP)) == 0) && ((PINC & (1 << DOWN)) == 0)){
+                    strcpy(highScoreStr, "        0");
+                    strcpy(highNameStr, "   ");
+                    highScoreVal = 0;
+                    eeprom_update_byte((void *) 0, -1); // Bad value so it would go back to default if no new score
+
+                    // Display message
+                    lcd_writecommand(1);
+                    lcd_moveto(0,0);
+                    lcd_stringout("High Score Reset");
+
+                    debounce(DOWN);
+                    _delay_ms(2000);
+
+                    //Return to how it should be
+                    lcd_writecommand(1);
+                    lcd_moveto(0,2);
+                    lcd_stringout("Select Seed");
+                    lcd_moveto(1,5);
+                    lcd_stringout(seed);
+                    lcd_moveto(1,5 + cursorIdx);
+                } else if(cursorIdx != 3){
                     cursorIdx++;
                     lcd_moveto(1,5 + cursorIdx);
-                    debounce(SELECT);
                 } else {
-                    debounce(SELECT);
                     srand(1000*(seed[3] - '0') + 100*(seed[2] - '0') + 10*(seed[1] - '0') + 1*(seed[0] - '0'));
                     lcd_writecommand(1);
                     break;
@@ -240,7 +262,7 @@ int main(void){
                     OCR2A = 245;
                     play_note(frequency[0]); _delay_ms(500);
                     
-                    OCR2A = 150;
+                    OCR2A = 200;
                     play_note(frequency[2]); _delay_ms(500);
 
                     OCR2A = 0;
