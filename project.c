@@ -20,8 +20,8 @@ void debounce(uint8_t);
 void shiftString(char*, char);
 char generateObstacle(uint8_t);
 
-uint16_t frequency[8] =
-    { 262, 294, 330, 349, 392, 440, 494, 523 };
+uint16_t frequency[9] =
+    { 262, 294, 330, 349, 392, 440, 494, 523, 587};
 
 int main(void){
     // Initialize the LCD
@@ -133,8 +133,8 @@ int main(void){
         char botOut[16] = "               ";
         bool topPast = 0;
         bool botPast = 0; 
-        count = 0;
         uint8_t currPos = 0;
+        uint16_t tempScore = 0;
 
         // Set seed by choosing 4 digits
         lcd_moveto(0,2);
@@ -224,21 +224,21 @@ int main(void){
                 lcd_moveto(0,3);
                 lcd_stringout("Game Over");
 
-                play_note(73); _delay_ms(500); // Sync sound with text
-                play_note(73); _delay_ms(500);
+                play_note(73, 1000); _delay_ms(1000); // Sync sound with text
+                //play_note(73); _delay_ms(500);
 
                 lcd_moveto(1,0);
                 lcd_stringout("Score:");
 
-                play_note(62); _delay_ms(500); // Sync sound with text
-                play_note(62); _delay_ms(500);
+                play_note(62, 1000); _delay_ms(1000); // Sync sound with text
+                //play_note(62); _delay_ms(500);
 
                 char scoreStr[10];
                 snprintf(scoreStr, 10, "%9d", score);
                 lcd_stringout(scoreStr);
                 
-                play_note(52); _delay_ms(500); // Sync sound with text
-                play_note(52); _delay_ms(500);
+                play_note(52, 1000); _delay_ms(1000); // Sync sound with text
+                //play_note(52); _delay_ms(500);
                 
                 lcd_stringout(">");
                 lcd_moveto(1,15);
@@ -260,13 +260,13 @@ int main(void){
                     PORTC |= (1 << RED); //Turn off Red
                     // Play C chord C,E,G and sync brighter and brighter green
                     OCR2A = 245;
-                    play_note(frequency[0]); _delay_ms(500);
+                    play_note(frequency[0], 500); _delay_ms(500);
                     
                     OCR2A = 200;
-                    play_note(frequency[2]); _delay_ms(500);
+                    play_note(frequency[2], 500); _delay_ms(500);
 
                     OCR2A = 0;
-                    play_note(frequency[4]); _delay_ms(500);
+                    play_note(frequency[4], 500); _delay_ms(500);
 
                     _delay_ms(1000);
 
@@ -373,11 +373,22 @@ int main(void){
                 lcd_moveto(1,16); // Move cursor off screen so it doesn't get in the way
             }
 
-            //Generate Chime Sound
+            // Generate Chime Sound
+            // Need to use score to know when to play the next note
             if(levelUp){
-                if(noteIdx != 8)
-                    play_note(frequency[noteIdx++]);
-                levelUp = 0;
+                if(noteIdx != 8){
+                    if(tempScore == 0)
+                        tempScore = score;
+                    if(score - tempScore < 3)
+                        play_note(frequency[noteIdx], 300);
+                    else {
+                        noteIdx++;
+                        play_note(frequency[noteIdx], 150);
+                        levelUp = 0;
+                        tempScore = 0;
+                    }
+                } else 
+                    levelUp = 0;
             }
 
             // Shift & Generate Obstacle

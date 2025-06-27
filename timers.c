@@ -11,10 +11,10 @@ uint16_t fCnt; // Counter for ISR to know note is 0.5 sec
 bool playingNote; // Used for making sure multiple notes don't play at the same time
 
 // Plays sound on buzzer for half a second
-void play_note(uint16_t freq)
+void play_note(uint16_t freq, uint16_t lengthMS)
 {
  	//Initialize global variable so that note lasts half a second
-    fCnt = freq;
+    fCnt = freq*(lengthMS/500.0);
  
      // Set modulus and start timer
     OCR0A = 16000000/1024/(2 * freq);
