@@ -191,7 +191,7 @@ int main(void){
                     cursorIdx++;
                     lcd_moveto(1,5 + cursorIdx);
                 } else {
-                    srand(1000*(seed[3] - '0') + 100*(seed[2] - '0') + 10*(seed[1] - '0') + 1*(seed[0] - '0'));
+                    srand(1000*(seed[0] - '0') + 100*(seed[1] - '0') + 10*(seed[2] - '0') + 1*(seed[3] - '0'));
                     lcd_writecommand(1);
                     break;
                 }
