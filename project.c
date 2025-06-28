@@ -251,6 +251,7 @@ int main(void){
 
                 // Update highScore only if current score is greater
                 if(score > highScoreVal){
+                    highScoreVal = score;
                     strcpy(highScoreStr, scoreStr);
                     lcd_writecommand(1);
                     lcd_moveto(0,1);
