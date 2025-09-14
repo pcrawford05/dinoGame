@@ -8,3 +8,27 @@ There are a few ways I could've made this game better, some of which I tried oth
 My biggest takeaways from this project are the value of Stack Overflow, the awesomeness of a highly tactile game, and the importance of persistance when debugging.
 
 Overall this project took about 2 weeks of work spread out over a month and total working hours was probably around 25. I got my inspiration from the Dinosaur Game on Chrome.
+
+
+step 1: add as much specifcity as possible!
+
+my proposed order:
+
+contextL i did ee109, we build stuff on arduino.. dino game is cool... i decided to try and build dino game on arduino
+
+order of implementation:
+1
+2
+3
+
+reflection: overall the process was generally like this. here is a specific example of how i implemented on of the things in this list.
+
+here are challenges i faced/ things i would want to implement in the future:
+talk about the stuff your sister said, the specialized objects
+
+overall it was a fun project, i enjoyed reviewing concepts from EE 109 like interrupts, EEPROM, and PWM. 
+
+my main takeaways are
+
+upload video to youtube
+
