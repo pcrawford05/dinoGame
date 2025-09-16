@@ -1,31 +1,111 @@
-Project I built over the summer using my EE109 project kit (Thank you Prof. Weber for lending it to me so I could build cool things like this).
-It was a lot of fun reviewing concepts from EE 109 like interrupts, EEPROM, and PWM. I tried to use as many of the concepts that I knew in this project and very much enjoyed it.
+DinoGame 🦖🎮
 
-I ended up using all 3 timers of the arduino: 1 for the buzzer, 1 for the score, and 1 for the PWM for the LED. I was really glad I didn't have to start from complete scratch as I had some files for the lcd written already and had some other basic ISR calls I could reference. One of the hardest things to implement was honestly nothing and everything. It felt like any time I tried to do anything a bunch of problems came up, I had to think about it, check my previous labs and lab writeups, then check Stack Overflow, and then I finally fixed it. This includes adding the buttons to the breadboard (rather than using the LCD buttons), adding the LED, adding the Buzzer, adding speed, adding EEPROM capabilities, and adding the helper functions for the actual game functionality.
+🎥 Demo Video: https://youtube.com/shorts/N5O_s678hBg?feature=share
 
-There are a few ways I could've made this game better, some of which I tried others which I did not (which may give me a reason to come back to this). I tried to add specialized obstacles but found it impossible without coding in the Arduino IDE so I had to use characters that were symmetrical in nature (I chose W and M to act as stalactites and stalagmites). The levelUp sound is not super elegant but my sister said it was good enough after telling me my previous version was bad so I left that as is. I left the obstacle generation as completely random (so walls could appear and make it impossible to pass). Funnily enough, somehow when I was first making this game I glitched through one of the walls but I was unable to replicate this move every other time I tried. The only time I used AI was to try to figure out the best seed but it didn't give me a good value, I decided to create my own program to determine this, and faced a bunch of issues (it just being wrong about how long one could go). I then checked Stack Overflow and people there said rand/srand are not good so I think my separate file was just coming up with different RNG's.
+📖 Project Story
 
-My biggest takeaways from this project are the value of Stack Overflow, the awesomeness of a highly tactile game, and the importance of persistance when debugging.
+In Spring 2025, I took Intro to Embedded Systems (EE109), a class that ended up reshaping my academic path. I enjoyed it so much that I switched my major from Computer Science to Computer Engineering and Computer Science (after talking with Prof. Weber).
 
-Overall this project took about 2 weeks of work spread out over a month and total working hours was probably around 25. I got my inspiration from the Dinosaur Game on Chrome.
+In the course, we built projects with an Arduino Uno and LCD shield—everything from interrupt-driven systems to a temperature monitor. When the semester ended, I hesitated to return my kit. After another conversation with Prof. Weber, he let me keep it for the summer to build whatever I wanted.
 
+That freedom—and some inspiration from the Chrome Dinosaur game—led me to create DinoGame, an embedded survival game played entirely on an LCD screen with tactile buttons, LEDs, and a buzzer.
 
-step 1: add as much specifcity as possible!
+This README is the story of how I built it, the challenges I faced, and the lessons I learned.
 
-my proposed order:
-Demo: https://youtube.com/shorts/N5O_s678hBg?feature=share
-Context:
-Spring 2025 semester I took a very engaging and interesting class called Intro to Embedded Systems (EE109). I liked it so much in fact that I switched my major from pure Computer Science to Computer Engineering and Computer Science (after talking with the professor, Prof. Weber). We built really cool projects with an Arduino Uno and an LCD shield in the lab inlcuding a temperature monitoring embedded system. At the end of the class I was delaying turning in my project kit (partially out of laziness, and partially because I didn't want to give up the cool tools I've been playing with). After another conversation with Prof. Weber, he let me keep the kit over the summer to work on any project I liked. This is the result of that. The inspiration for this project is the Google Chrome Dinosaur game but I'm not exactly sure where it came from (trust me I was focused in this class not playing games). The following is the story of my implementation, challenges, and insights from building dinoGame. I hope you enjoy.
+⚙️ Implementation Journey
 
-Implementation:
-For this project, I wanted to use as many concepts from EE109 as possible and I hope you see that in the implementation. First, the LCD screen has two rows on it so I knew I couldn't implement jumping but I could do some sort of dodging where the obstacles come at you from right to left. I started by using the LCD buttons to make the game very compact but then realized that I wanted to add an LED somehow and a buzzer so I would need a breadboard. Since I had a breadboard, I knew I wanted to add bigger buttons for the player to use. At this point in the project while it was still very early I made a list at the top of my code of all the things I wanted to implement: LED that changed color (red/green (brighter/darker)), local memory storage for high score (even when it loses power), increasing speed of obstacles, seed function so that you would get different obstacles, a buzzer for something, real buttons, designed obstacles, scoring (high scores), ______ (blank space for more ideas to come). Then, when I had inspiration to work on the project, I'd look at my feature list and did my best to implement them. I had the basics of the game down at the beginning while still using the LCD buttons: obstacles (m and w for now because they are symmetrical) would shift left while the player (A for now) would "dodge" or jump up and down to avoid the obstacles; I made it so that there was a 10% chance of an obstacle so impossible walls were possible (no way to get past obstacle). Then I added the buttons to the board and I struggled to get the game to work again. I totally forget what debouncing was and why it was important so I had to scrape through my EE109 docs to try to relearn debouncing and interrupts, I figured it out, had to change my code way more than I would've thought then I finally had the buttons working. Next I added scoring. For this I used a timer (timer1) and decided that the score should be based on time and specifically (10 ms). It was at first 1 every second but then your score is only 14 so I changed it to every 10 ms. However, this whole process was a good amount of work as well because I needed to go through the Arduino documentation to remember how to configure the timer and decide which timer is best (I chose timer1 because it's a 16-bit timer so a player could play for 100 minutes and not have any issues with the timer vs timer0 and timer2 you could only do 25 seconds (at least without a slightly more complex configuration besides just outputting the timer's value)). After figuring that out, I wanted to add an LED and I knew I wanted to use the tricolor LED to have both red (for when you lose) and an increasingly bright green light. This is when I realized I wanted some sort of levelUp feature which is where the buzzer comes in (as a chime). For the LED, once again I had to do research again on what resistors to use and how to orient the LED properly. This wasn't too bad but doing the Pulse Width Modulation (PWM) for the changing brightness LED was very difficult. Once again, I needed to review both the EE109 docs and the Arduino docs to relearn how to configure the PWM. This was the trend for implementing new features: I thought of a cool idea, tried to add it using my memory, failed, reviewed the documentation, failed but made progress, checked it again and Stack Overflow, progress, completion. In this way, all new features were difficult and easy to implement at the same time. They were difficult because I didn't know how to do things but I had my process which was essentially flawless. I used this same process to add speed functionality, a buzzer, high scoring, local memory, a seed function, and custom obstacles. The last three were particularly challenging. Local memory storage was at first annoying because I had to figure out how to ensure that I got good values from the EEPROM (local memory storage). I had to use my process for this and eventually figured it out. Then I had an idea to have a high score for every seed so that the player could try to get the high score for any seed (not just the overall seed). Unfortunately I ran into issues because the local memory storage is small and couldn't hold scores for 10000 seeds. If I remember correctly it couldn't hold for even 1000 seeds because it holds bytes and I assumed that the player could get up to 1000+ points which would require 1,003,000 bytes of storage (3,000 for 3 characters per high score). I don't believe it had storage for this (though I may need to explore this again when I come back to this project). The next big challenge was the seed function. The initial implementation for this was relatively easy but then I wanted to determine the best seed (because a "wall" could pop up, there is theoretically a best seed). I was going to make my own code but thought this isn't the focus of this project and used ChatGPT. This was the only time I used ChatGPT and it said 1200 (I don't remember exactly but let's say it was 1200). Then I tested it and lost immediately. Then I decided to code it on my own and got 0400 (may have been a different number). I made it slightly further but it was no where near my record. Then I found in StackOverflow that srand isn't consistent across different files/environments. I still don't exactly know how to deal with this because I assume if I just changed my original file then it would change the srand (maybe it is based off the number of characters/spaces in a file). So I wasn't able to do that. The last feature I tried to implement was custom obstacles. I thought I would be able to do this because each pixel space is 5x8 pixels so I envisioned that there could be stalactites and stalagtites. However, after going throug the arduino documentation for over an hour and testing importing different packages, it seemed like the only wasy to do this was with local functions only found in the Arduino IDE. Although, I feel if I tried a little harder I maybe could've done it but of course this is in hindsight.
+I wanted to use as many EE109 concepts as possible. Here’s how the project evolved:
 
-reflection: Overall the process was very rewarding as I reviewed essentially all the topics from EE109 and produced a very cool tactile game. I was able to show this game to my friends which is where some of the feature ideas and future improvements come in. Almost everyone, said that the speed started off too slow. I noticed that older people (my parents and grandpa) took significantly longer to understand the buttons compared to younger people (my sister and friends). My sister didn't like the levelUp sound so I changed the frequencies to make it more like an octave (the notes keep increasing) and said it was good but not great after I fixed it. It also took basically everyone a much longer time to understand the "A" was the player. When I heard this I wish I could've had custom characters. 
-This is both a note to readers and for myself: here are a list of things I want to see if I can implement when I come back to it:
-  Faster initial speed
-  More harmonious buzzer chime
-  Simplified and obvious button layout
-  Custom characters?
-  Less seeds, seed specific high scores
+Core Idea
 
-Overall it was a fun project, i enjoyed reviewing concepts from EE 109 like interrupts, EEPROM, and PWM. My biggest takeaways from this project are the value of Stack Overflow, the awesomeness of a highly tactile game, and the importance of persistance when debugging.
+LCD has only 2 rows → no jumping, so I designed a dodge mechanic instead.
+
+Obstacles (like m and w) move right → left.
+
+Player (A) dodges up and down.
+
+Expanding Features
+
+I created a feature wishlist at the top of my code:
+
+✅ LED (red/green with brightness control)
+
+✅ Local memory storage for high score (EEPROM)
+
+✅ Increasing speed of obstacles
+
+✅ Seed function for randomized runs
+
+✅ Buzzer (level-up chime + game-over sound)
+
+✅ Real tactile buttons (with debouncing & interrupts)
+
+✅ Scoring system
+
+🔲 Custom obstacles (attempted, see Challenges below)
+
+I would pick a feature, try to implement it from memory, fail, recheck docs/Stack Overflow, make progress, and eventually succeed. That cycle became my core process for development.
+
+Notable Technical Challenges
+
+Debouncing & interrupts → Forgot how tricky they were; had to revisit class notes before finally stabilizing input.
+
+Timers → Configured timer1 (16-bit) for scoring to support long play sessions (up to 100 minutes) without overflow.
+
+PWM & LEDs → Spent significant time relearning PWM for LED brightness levels.
+
+EEPROM Storage → Wanted per-seed high scores but hit memory limits (EEPROM too small to store thousands of scores).
+
+Random Seeds → Learned that srand isn’t consistent across files/environments; debugging this was frustrating.
+
+Custom Characters → Spent hours on Arduino docs; discovered only IDE-specific functions supported it—so I had to cut this feature (for now).
+
+📝 Reflection
+
+This project helped me:
+
+Reinforce key EE109 topics (interrupts, EEPROM, PWM, timers).
+
+Develop a repeatable problem-solving process (idea → attempt → docs → Stack Overflow → persistence → solution).
+
+Experience the joy of building a tactile, physical game—something friends and family could immediately play.
+
+User Feedback & Insights
+
+Players thought the starting speed was too slow.
+
+Older testers took longer to figure out the button layout vs. younger ones.
+
+My sister didn’t like the buzzer at first; I iterated to make a more harmonious octave sound.
+
+Most players struggled to see that “A” was the player, reinforcing the need for custom characters.
+
+Future Improvements
+
+Faster initial speed.
+
+More harmonious buzzer chime.
+
+Simpler button layout.
+
+Seed-specific high scores (with optimized storage).
+
+Custom characters for better visuals.
+
+🌟 Takeaways
+
+Persistence beats frustration—debugging was always a cycle of progress, even when it felt stuck.
+
+Stack Overflow is invaluable, but only after trying my own reasoning.
+
+Hands-on embedded systems create a different kind of joy than pure software—it feels alive.
+
+🧑‍💻 Tech & Tools
+
+Hardware: Arduino Uno, LCD shield, breadboard, tri-color LED, buzzer, tactile buttons.
+
+Software: Arduino IDE, C++ (embedded).
+
+Concepts Used: Interrupts, debouncing, timers, PWM, EEPROM, pseudo-random seeds.
+
+That’s DinoGame—a playful experiment that turned into one of my most rewarding projects.
